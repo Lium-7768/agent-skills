@@ -17,23 +17,7 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Initialize App Once, Not Per Mount",
-    "type": "bad",
-    "code": "function Comp() {\n  useEffect(() => {\n    loadFromStorage()\n    checkAuthToken()\n  }, [])\n\n  // ...\n}",
-    "language": "tsx",
-    "description": "runs twice in dev, re-runs on remount"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Initialize App Once, Not Per Mount",
-    "type": "good",
-    "code": "let didInit = false\n\nfunction Comp() {\n  useEffect(() => {\n    if (didInit) return\n    didInit = true\n    loadFromStorage()\n    checkAuthToken()\n  }, [])\n\n  // ...\n}",
-    "language": "tsx",
-    "description": "once per app load"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "useEffectEvent for Stable Callback Refs",
+    "ruleTitle": "useLatest for Stable Callback Refs",
     "type": "bad",
     "code": "function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {\n  const [query, setQuery] = useState('')\n\n  useEffect(() => {\n    const timeout = setTimeout(() => onSearch(query), 300)\n    return () => clearTimeout(timeout)\n  }, [query, onSearch])\n}",
     "language": "tsx",
@@ -41,11 +25,11 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "useEffectEvent for Stable Callback Refs",
+    "ruleTitle": "useLatest for Stable Callback Refs",
     "type": "good",
-    "code": "import { useEffectEvent } from 'react';\n\nfunction SearchInput({ onSearch }: { onSearch: (q: string) => void }) {\n  const [query, setQuery] = useState('')\n  const onSearchEvent = useEffectEvent(onSearch)\n\n  useEffect(() => {\n    const timeout = setTimeout(() => onSearchEvent(query), 300)\n    return () => clearTimeout(timeout)\n  }, [query])\n}",
+    "code": "function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {\n  const [query, setQuery] = useState('')\n  const onSearchRef = useLatest(onSearch)\n\n  useEffect(() => {\n    const timeout = setTimeout(() => onSearchRef.current(query), 300)\n    return () => clearTimeout(timeout)\n  }, [query])\n}",
     "language": "tsx",
-    "description": "using React's useEffectEvent"
+    "description": "stable effect, fresh callback"
   },
   {
     "ruleId": "",
@@ -241,27 +225,19 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Avoid Layout Thrashing",
+    "ruleTitle": "Batch DOM CSS Changes",
     "type": "bad",
-    "code": "function layoutThrashing(element: HTMLElement) {\n  element.style.width = '100px'\n  const width = element.offsetWidth  // Forces reflow\n  element.style.height = '200px'\n  const height = element.offsetHeight  // Forces another reflow\n}",
+    "code": "function updateElementStyles(element: HTMLElement) {\n  element.style.width = '100px'\n  const width = element.offsetWidth  // Forces reflow\n  element.style.height = '200px'\n  const height = element.offsetHeight  // Forces another reflow\n}",
     "language": "typescript",
     "description": "interleaved reads and writes force reflows"
   },
   {
     "ruleId": "",
-    "ruleTitle": "Avoid Layout Thrashing",
+    "ruleTitle": "Batch DOM CSS Changes",
     "type": "good",
-    "code": "function updateElementStyles(element: HTMLElement) {\n  // Batch all writes together\n  element.style.width = '100px'\n  element.style.height = '200px'\n  element.style.backgroundColor = 'blue'\n  element.style.border = '1px solid black'\n  \n  // Read after all writes are done (single reflow)\n  const { width, height } = element.getBoundingClientRect()\n}",
+    "code": "function updateElementStyles(element: HTMLElement) {\n  element.classList.add('highlighted-box')\n\n  const { width, height } = element.getBoundingClientRect()\n}",
     "language": "typescript",
     "description": "batch writes, then read once"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Avoid Layout Thrashing",
-    "type": "good",
-    "code": "function updateElementStyles(element: HTMLElement) {\n  element.classList.add('highlighted-box')\n  \n  const { width, height } = element.getBoundingClientRect()\n}",
-    "language": "typescript",
-    "description": "batch reads, then writes"
   },
   {
     "ruleId": "",
@@ -521,22 +497,6 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Suppress Expected Hydration Mismatches",
-    "type": "bad",
-    "code": "function Timestamp() {\n  return <span>{new Date().toLocaleString()}</span>\n}",
-    "language": "tsx",
-    "description": "known mismatch warnings"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Suppress Expected Hydration Mismatches",
-    "type": "good",
-    "code": "function Timestamp() {\n  return (\n    <span suppressHydrationWarning>\n      {new Date().toLocaleString()}\n    </span>\n  )\n}",
-    "language": "tsx",
-    "description": "suppress expected mismatch only"
-  },
-  {
-    "ruleId": "",
     "ruleTitle": "Optimize SVG Precision",
     "type": "bad",
     "code": "<path d=\"M 10.293847 20.847362 L 30.938472 40.192837\" />",
@@ -550,22 +510,6 @@
     "code": "<path d=\"M 10.3 20.8 L 30.9 40.2\" />",
     "language": "svg",
     "description": "1 decimal place"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Use useTransition Over Manual Loading States",
-    "type": "bad",
-    "code": "function SearchResults() {\n  const [query, setQuery] = useState('')\n  const [results, setResults] = useState([])\n  const [isLoading, setIsLoading] = useState(false)\n\n  const handleSearch = async (value: string) => {\n    setIsLoading(true)\n    setQuery(value)\n    const data = await fetchResults(value)\n    setResults(data)\n    setIsLoading(false)\n  }\n\n  return (\n    <>\n      <input onChange={(e) => handleSearch(e.target.value)} />\n      {isLoading && <Spinner />}\n      <ResultsList results={results} />\n    </>\n  )\n}",
-    "language": "tsx",
-    "description": "manual loading state"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Use useTransition Over Manual Loading States",
-    "type": "good",
-    "code": "import { useTransition, useState } from 'react'\n\nfunction SearchResults() {\n  const [query, setQuery] = useState('')\n  const [results, setResults] = useState([])\n  const [isPending, startTransition] = useTransition()\n\n  const handleSearch = (value: string) => {\n    setQuery(value) // Update input immediately\n    \n    startTransition(async () => {\n      // Fetch and update results\n      const data = await fetchResults(value)\n      setResults(data)\n    })\n  }\n\n  return (\n    <>\n      <input onChange={(e) => handleSearch(e.target.value)} />\n      {isPending && <Spinner />}\n      <ResultsList results={results} />\n    </>\n  )\n}",
-    "language": "tsx",
-    "description": "useTransition with built-in pending state"
   },
   {
     "ruleId": "",
@@ -598,22 +542,6 @@
     "code": "useEffect(() => {\n  console.log(user.id)\n}, [user.id])",
     "language": "tsx",
     "description": "re-runs only when id changes"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Calculate Derived State During Rendering",
-    "type": "bad",
-    "code": "function Form() {\n  const [firstName, setFirstName] = useState('First')\n  const [lastName, setLastName] = useState('Last')\n  const [fullName, setFullName] = useState('')\n\n  useEffect(() => {\n    setFullName(firstName + ' ' + lastName)\n  }, [firstName, lastName])\n\n  return <p>{fullName}</p>\n}",
-    "language": "tsx",
-    "description": "redundant state and effect"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Calculate Derived State During Rendering",
-    "type": "good",
-    "code": "function Form() {\n  const [firstName, setFirstName] = useState('First')\n  const [lastName, setLastName] = useState('Last')\n  const fullName = firstName + ' ' + lastName\n\n  return <p>{fullName}</p>\n}",
-    "language": "tsx",
-    "description": "derive during render"
   },
   {
     "ruleId": "",
@@ -665,22 +593,6 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Extract Default Non-primitive Parameter Value from Memoized Component to Constant",
-    "type": "bad",
-    "code": "const UserAvatar = memo(function UserAvatar({ onClick = () => {} }: { onClick?: () => void }) {\n  // ...\n})\n\n// Used without optional onClick\n<UserAvatar />",
-    "language": "tsx",
-    "description": "`onClick` has different values on every rerender"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Extract Default Non-primitive Parameter Value from Memoized Component to Constant",
-    "type": "good",
-    "code": "const NOOP = () => {};\n\nconst UserAvatar = memo(function UserAvatar({ onClick = NOOP }: { onClick?: () => void }) {\n  // ...\n})\n\n// Used without optional onClick\n<UserAvatar />",
-    "language": "tsx",
-    "description": "stable default value"
-  },
-  {
-    "ruleId": "",
     "ruleTitle": "Extract to Memoized Components",
     "type": "bad",
     "code": "function Profile({ user, loading }: Props) {\n  const avatar = useMemo(() => {\n    const id = computeAvatarId(user)\n    return <Avatar id={id} />\n  }, [user])\n\n  if (loading) return <Skeleton />\n  return <div>{avatar}</div>\n}",
@@ -697,38 +609,6 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Put Interaction Logic in Event Handlers",
-    "type": "bad",
-    "code": "function Form() {\n  const [submitted, setSubmitted] = useState(false)\n  const theme = useContext(ThemeContext)\n\n  useEffect(() => {\n    if (submitted) {\n      post('/api/register')\n      showToast('Registered', theme)\n    }\n  }, [submitted, theme])\n\n  return <button onClick={() => setSubmitted(true)}>Submit</button>\n}",
-    "language": "tsx",
-    "description": "event modeled as state + effect"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Put Interaction Logic in Event Handlers",
-    "type": "good",
-    "code": "function Form() {\n  const theme = useContext(ThemeContext)\n\n  function handleSubmit() {\n    post('/api/register')\n    showToast('Registered', theme)\n  }\n\n  return <button onClick={handleSubmit}>Submit</button>\n}",
-    "language": "tsx",
-    "description": "do it in the handler"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Do not wrap a simple expression with a primitive result type in useMemo",
-    "type": "bad",
-    "code": "function Header({ user, notifications }: Props) {\n  const isLoading = useMemo(() => {\n    return user.isLoading || notifications.isLoading\n  }, [user.isLoading, notifications.isLoading])\n\n  if (isLoading) return <Skeleton />\n  // return some markup\n}",
-    "language": "tsx",
-    "description": "Incorrect example for Do not wrap a simple expression with a primitive result type in useMemo"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Do not wrap a simple expression with a primitive result type in useMemo",
-    "type": "good",
-    "code": "function Header({ user, notifications }: Props) {\n  const isLoading = user.isLoading || notifications.isLoading\n\n  if (isLoading) return <Skeleton />\n  // return some markup\n}",
-    "language": "tsx",
-    "description": "Correct example for Do not wrap a simple expression with a primitive result type in useMemo"
-  },
-  {
-    "ruleId": "",
     "ruleTitle": "Use Transitions for Non-Urgent Updates",
     "type": "bad",
     "code": "function ScrollTracker() {\n  const [scrollY, setScrollY] = useState(0)\n  useEffect(() => {\n    const handler = () => setScrollY(window.scrollY)\n    window.addEventListener('scroll', handler, { passive: true })\n    return () => window.removeEventListener('scroll', handler)\n  }, [])\n}",
@@ -742,22 +622,6 @@
     "code": "import { startTransition } from 'react'\n\nfunction ScrollTracker() {\n  const [scrollY, setScrollY] = useState(0)\n  useEffect(() => {\n    const handler = () => {\n      startTransition(() => setScrollY(window.scrollY))\n    }\n    window.addEventListener('scroll', handler, { passive: true })\n    return () => window.removeEventListener('scroll', handler)\n  }, [])\n}",
     "language": "tsx",
     "description": "non-blocking updates"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Use useRef for Transient Values",
-    "type": "bad",
-    "code": "function Tracker() {\n  const [lastX, setLastX] = useState(0)\n\n  useEffect(() => {\n    const onMove = (e: MouseEvent) => setLastX(e.clientX)\n    window.addEventListener('mousemove', onMove)\n    return () => window.removeEventListener('mousemove', onMove)\n  }, [])\n\n  return (\n    <div\n      style={{\n        position: 'fixed',\n        top: 0,\n        left: lastX,\n        width: 8,\n        height: 8,\n        background: 'black',\n      }}\n    />\n  )\n}",
-    "language": "tsx",
-    "description": "renders every update"
-  },
-  {
-    "ruleId": "",
-    "ruleTitle": "Use useRef for Transient Values",
-    "type": "good",
-    "code": "function Tracker() {\n  const lastXRef = useRef(0)\n  const dotRef = useRef<HTMLDivElement>(null)\n\n  useEffect(() => {\n    const onMove = (e: MouseEvent) => {\n      lastXRef.current = e.clientX\n      const node = dotRef.current\n      if (node) {\n        node.style.transform = `translateX(${e.clientX}px)`\n      }\n    }\n    window.addEventListener('mousemove', onMove)\n    return () => window.removeEventListener('mousemove', onMove)\n  }, [])\n\n  return (\n    <div\n      ref={dotRef}\n      style={{\n        position: 'fixed',\n        top: 0,\n        left: 0,\n        width: 8,\n        height: 8,\n        background: 'black',\n        transform: 'translateX(0px)',\n      }}\n    />\n  )\n}",
-    "language": "tsx",
-    "description": "no re-render for tracking"
   },
   {
     "ruleId": "",
