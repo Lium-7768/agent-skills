@@ -61,7 +61,6 @@ Reference these guidelines when:
 
 ### 4. Client-Side Data Fetching (MEDIUM-HIGH)
 
-- `client-swr-dedup` - Use SWR for automatic request deduplication
 - `client-event-listeners` - Deduplicate global event listeners
 
 ### 5. Re-render Optimization (MEDIUM)
