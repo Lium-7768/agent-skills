@@ -1,0 +1,27 @@
+{
+  "name": "react-core-patterns",
+  "version": "1.0.0",
+  "description": "React official best practices from react.dev documentation. Essential rules for writing correct, predictable React code.",
+  "author": "React Team / react.dev",
+  "license": "MIT",
+  "categories": [
+    "react",
+    "frontend",
+    "best-practices",
+    "hooks",
+    "state-management",
+    "accessibility"
+  ],
+  "triggers": [
+    "react",
+    "component",
+    "hook",
+    "useState",
+    "useEffect",
+    "useMemo",
+    "useCallback",
+    "jsx",
+    "tsx"
+  ],
+  "priority": "critical"
+}
