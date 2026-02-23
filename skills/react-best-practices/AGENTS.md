@@ -1,20 +1,20 @@
 # React Best Practices
 
-**Version 1.0.0**  
-Vercel Engineering  
-January 2026
+**Version 2.0.0**
+Vercel Engineering + React Official
+February 2026
 
-> **Note:**  
-> This document is mainly for agents and LLMs to follow when maintaining,  
-> generating, or refactoring React and Next.js codebases at Vercel. Humans  
-> may also find it useful, but guidance here is optimized for automation  
+> **Note:**
+> This document is mainly for agents and LLMs to follow when maintaining,
+> generating, or refactoring React and Next.js codebases. Humans
+> may also find it useful, but guidance here is optimized for automation
 > and consistency by AI-assisted workflows.
 
 ---
 
 ## Abstract
 
-Comprehensive performance optimization guide for React and Next.js applications, designed for AI agents and LLMs. Contains 40+ rules across 8 categories, prioritized by impact from critical (eliminating waterfalls, reducing bundle size) to incremental (advanced patterns). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
+Comprehensive guide combining Vercel's performance optimization rules with React official documentation best practices. Contains 70+ rules across 9 categories, prioritized by impact from critical (eliminating waterfalls, reducing bundle size) to incremental (advanced patterns). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
 
 ---
 
@@ -40,43 +40,60 @@ Comprehensive performance optimization guide for React and Next.js applications,
    - 3.5 [Parallel Data Fetching with Component Composition](#35-parallel-data-fetching-with-component-composition)
    - 3.6 [Per-Request Deduplication with React.cache()](#36-per-request-deduplication-with-reactcache)
    - 3.7 [Use after() for Non-Blocking Operations](#37-use-after-for-non-blocking-operations)
-4. [Client-Side Data Fetching](#4-client-side-data-fetching) — **MEDIUM-HIGH**
-   - 4.1 [Deduplicate Global Event Listeners](#41-deduplicate-global-event-listeners)
-   - 4.2 [Use Passive Event Listeners for Scrolling Performance](#42-use-passive-event-listeners-for-scrolling-performance)
-   - 4.3 [Use SWR for Automatic Deduplication](#43-use-swr-for-automatic-deduplication)
-   - 4.4 [Version and Minimize localStorage Data](#44-version-and-minimize-localstorage-data)
-5. [Re-render Optimization](#5-re-render-optimization) — **MEDIUM**
-   - 5.1 [Defer State Reads to Usage Point](#51-defer-state-reads-to-usage-point)
-   - 5.2 [Extract to Memoized Components](#52-extract-to-memoized-components)
-   - 5.3 [Narrow Effect Dependencies](#53-narrow-effect-dependencies)
-   - 5.4 [Subscribe to Derived State](#54-subscribe-to-derived-state)
-   - 5.5 [Use Functional setState Updates](#55-use-functional-setstate-updates)
-   - 5.6 [Use Lazy State Initialization](#56-use-lazy-state-initialization)
-   - 5.7 [Use Transitions for Non-Urgent Updates](#57-use-transitions-for-non-urgent-updates)
-6. [Rendering Performance](#6-rendering-performance) — **MEDIUM**
-   - 6.1 [Animate SVG Wrapper Instead of SVG Element](#61-animate-svg-wrapper-instead-of-svg-element)
-   - 6.2 [CSS content-visibility for Long Lists](#62-css-content-visibility-for-long-lists)
-   - 6.3 [Hoist Static JSX Elements](#63-hoist-static-jsx-elements)
-   - 6.4 [Optimize SVG Precision](#64-optimize-svg-precision)
-   - 6.5 [Prevent Hydration Mismatch Without Flickering](#65-prevent-hydration-mismatch-without-flickering)
-   - 6.6 [Use Activity Component for Show/Hide](#66-use-activity-component-for-showhide)
-   - 6.7 [Use Explicit Conditional Rendering](#67-use-explicit-conditional-rendering)
-7. [JavaScript Performance](#7-javascript-performance) — **LOW-MEDIUM**
-   - 7.1 [Batch DOM CSS Changes](#71-batch-dom-css-changes)
-   - 7.2 [Build Index Maps for Repeated Lookups](#72-build-index-maps-for-repeated-lookups)
-   - 7.3 [Cache Property Access in Loops](#73-cache-property-access-in-loops)
-   - 7.4 [Cache Repeated Function Calls](#74-cache-repeated-function-calls)
-   - 7.5 [Cache Storage API Calls](#75-cache-storage-api-calls)
-   - 7.6 [Combine Multiple Array Iterations](#76-combine-multiple-array-iterations)
-   - 7.7 [Early Length Check for Array Comparisons](#77-early-length-check-for-array-comparisons)
-   - 7.8 [Early Return from Functions](#78-early-return-from-functions)
-   - 7.9 [Hoist RegExp Creation](#79-hoist-regexp-creation)
-   - 7.10 [Use Loop for Min/Max Instead of Sort](#710-use-loop-for-minmax-instead-of-sort)
-   - 7.11 [Use Set/Map for O(1) Lookups](#711-use-setmap-for-o1-lookups)
-   - 7.12 [Use toSorted() Instead of sort() for Immutability](#712-use-tosorted-instead-of-sort-for-immutability)
-8. [Advanced Patterns](#8-advanced-patterns) — **LOW**
-   - 8.1 [Store Event Handlers in Refs](#81-store-event-handlers-in-refs)
-   - 8.2 [useLatest for Stable Callback Refs](#82-uselatest-for-stable-callback-refs)
+4. [React Official Best Practices](#4-react-official-best-practices) — **HIGH**
+   - 4.1 [Component Naming Convention](#41-component-naming-convention)
+   - 4.2 [Never Define Components Inside Other Components](#42-never-define-components-inside-other-components)
+   - 4.3 [Keep Components Pure](#43-keep-components-pure)
+   - 4.4 [Use Props Destructuring with Default Values](#44-use-props-destructuring-with-default-values)
+   - 4.5 [Never Mutate Props Directly](#45-never-mutate-props-directly)
+   - 4.6 [Use Correct Keys for List Rendering](#46-use-correct-keys-for-list-rendering)
+   - 4.7 [Design State Structure Properly](#47-design-state-structure-properly)
+   - 4.8 [Update Objects and Arrays Immutably](#48-update-objects-and-arrays-immutably)
+   - 4.9 [Lift State Up to Closest Common Parent](#49-lift-state-up-to-closest-common-parent)
+   - 4.10 [Reset State with Key Prop](#410-reset-state-with-key-prop)
+   - 4.11 [Use useReducer for Complex State Logic](#411-use-usereducer-for-complex-state-logic)
+   - 4.12 [Use Context for Deep Prop Passing](#412-use-context-for-deep-prop-passing)
+   - 4.13 [Use Refs for Non-Render Values](#413-use-refs-for-non-render-values)
+   - 4.14 [You Might Not Need an Effect](#414-you-might-not-need-an-effect)
+   - 4.15 [Always Clean Up Effects](#415-always-clean-up-effects)
+   - 4.16 [Create Custom Hooks for Reusable Logic](#416-create-custom-hooks-for-reusable-logic)
+5. [Client-Side Data Fetching](#5-client-side-data-fetching) — **MEDIUM-HIGH**
+   - 5.1 [Deduplicate Global Event Listeners](#51-deduplicate-global-event-listeners)
+   - 5.2 [Use Passive Event Listeners for Scrolling Performance](#52-use-passive-event-listeners-for-scrolling-performance)
+   - 5.3 [Use SWR for Automatic Deduplication](#53-use-swr-for-automatic-deduplication)
+   - 5.4 [Version and Minimize localStorage Data](#54-version-and-minimize-localstorage-data)
+6. [Re-render Optimization](#6-re-render-optimization) — **MEDIUM**
+   - 6.1 [Defer State Reads to Usage Point](#61-defer-state-reads-to-usage-point)
+   - 6.2 [Extract to Memoized Components](#62-extract-to-memoized-components)
+   - 6.3 [Narrow Effect Dependencies](#63-narrow-effect-dependencies)
+   - 6.4 [Subscribe to Derived State](#64-subscribe-to-derived-state)
+   - 6.5 [Use Functional setState Updates](#65-use-functional-setstate-updates)
+   - 6.6 [Use Lazy State Initialization](#66-use-lazy-state-initialization)
+   - 6.7 [Use Transitions for Non-Urgent Updates](#67-use-transitions-for-non-urgent-updates)
+7. [Rendering Performance](#7-rendering-performance) — **MEDIUM**
+   - 7.1 [Animate SVG Wrapper Instead of SVG Element](#71-animate-svg-wrapper-instead-of-svg-element)
+   - 7.2 [CSS content-visibility for Long Lists](#72-css-content-visibility-for-long-lists)
+   - 7.3 [Hoist Static JSX Elements](#73-hoist-static-jsx-elements)
+   - 7.4 [Optimize SVG Precision](#74-optimize-svg-precision)
+   - 7.5 [Prevent Hydration Mismatch Without Flickering](#75-prevent-hydration-mismatch-without-flickering)
+   - 7.6 [Use Activity Component for Show/Hide](#76-use-activity-component-for-showhide)
+   - 7.7 [Use Explicit Conditional Rendering](#77-use-explicit-conditional-rendering)
+8. [JavaScript Performance](#8-javascript-performance) — **LOW-MEDIUM**
+   - 8.1 [Batch DOM CSS Changes](#81-batch-dom-css-changes)
+   - 8.2 [Build Index Maps for Repeated Lookups](#82-build-index-maps-for-repeated-lookups)
+   - 8.3 [Cache Property Access in Loops](#83-cache-property-access-in-loops)
+   - 8.4 [Cache Repeated Function Calls](#84-cache-repeated-function-calls)
+   - 8.5 [Cache Storage API Calls](#85-cache-storage-api-calls)
+   - 8.6 [Combine Multiple Array Iterations](#86-combine-multiple-array-iterations)
+   - 8.7 [Early Length Check for Array Comparisons](#87-early-length-check-for-array-comparisons)
+   - 8.8 [Early Return from Functions](#88-early-return-from-functions)
+   - 8.9 [Hoist RegExp Creation](#89-hoist-regexp-creation)
+   - 8.10 [Use Loop for Min/Max Instead of Sort](#810-use-loop-for-minmax-instead-of-sort)
+   - 8.11 [Use Set/Map for O(1) Lookups](#811-use-setmap-for-o1-lookups)
+   - 8.12 [Use toSorted() Instead of sort() for Immutability](#812-use-tosorted-instead-of-sort-for-immutability)
+9. [Advanced Patterns](#9-advanced-patterns) — **LOW**
+   - 9.1 [Store Event Handlers in Refs](#91-store-event-handlers-in-refs)
+   - 9.2 [useLatest for Stable Callback Refs](#92-uselatest-for-stable-callback-refs)
 
 ---
 
@@ -1013,13 +1030,481 @@ Reference: [https://nextjs.org/docs/app/api-reference/functions/after](https://n
 
 ---
 
-## 4. Client-Side Data Fetching
+## 4. React Official Best Practices
+
+**Impact: HIGH**
+
+Core React patterns and best practices from the official React documentation. These rules ensure correct React behavior and prevent common bugs.
+
+### 4.1 Component Naming Convention
+
+**Impact: HIGH (prevents rendering issues)**
+
+React component names must start with a capital letter. This is how React distinguishes components from HTML tags.
+
+**Incorrect:**
+
+```tsx
+// This will not render correctly
+function myButton() {
+  return <button>Click me</button>
+}
+```
+
+**Correct:**
+
+```tsx
+// Capital letter at the start
+function MyButton() {
+  return <button>Click me</button>
+}
+```
+
+Reference: [Your First Component](https://react.dev/learn/your-first-component)
+
+### 4.2 Never Define Components Inside Other Components
+
+**Impact: HIGH (prevents infinite re-renders)**
+
+Never define a component inside another component. This causes the inner component to be recreated on every render.
+
+**Incorrect:**
+
+```tsx
+function Parent() {
+  // ❌ Child is recreated on every Parent render!
+  function Child() {
+    const [count, setCount] = useState(0)
+    return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+  }
+  return <div><Child /></div>
+}
+```
+
+**Correct:**
+
+```tsx
+// ✅ Define at the top level
+function Child() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+}
+
+function Parent() {
+  return <div><Child /></div>
+}
+```
+
+Reference: [Your First Component](https://react.dev/learn/your-first-component)
+
+### 4.3 Keep Components Pure
+
+**Impact: HIGH (ensures predictable behavior)**
+
+React components should be pure functions: given the same props, they should always return the same JSX.
+
+**Incorrect:**
+
+```tsx
+let guestCount = 0
+
+function Cup() {
+  guestCount++  // ❌ Side effect during render!
+  return <h2>Tea cup for guest #{guestCount}</h2>
+}
+```
+
+**Correct:**
+
+```tsx
+function Cup({ guest }: { guest: number }) {
+  return <h2>Tea cup for guest #{guest}</h2>  // ✅ Pure
+}
+```
+
+Reference: [Keeping Components Pure](https://react.dev/learn/keeping-components-pure)
+
+### 4.4 Use Props Destructuring with Default Values
+
+**Impact: MEDIUM (improves readability)**
+
+Destructure props in the function signature for cleaner code. Use default values for optional props.
+
+**Incorrect:**
+
+```tsx
+function Avatar(props) {
+  return (
+    <img
+      src={props.person.imageUrl}
+      width={props.size}  // undefined if not passed
+    />
+  )
+}
+```
+
+**Correct:**
+
+```tsx
+function Avatar({ person, size = 100 }: AvatarProps) {
+  return (
+    <img
+      src={person.imageUrl}
+      width={size}   // defaults to 100
+    />
+  )
+}
+```
+
+Reference: [Passing Props to a Component](https://react.dev/learn/passing-props-to-a-component)
+
+### 4.5 Never Mutate Props Directly
+
+**Impact: HIGH (prevents bugs)**
+
+Props are read-only. Never modify props directly.
+
+**Incorrect:**
+
+```tsx
+function Profile({ user }) {
+  user.name = 'New Name'  // ❌ Direct mutation!
+  return <div>{user.name}</div>
+}
+```
+
+**Correct:**
+
+```tsx
+function Profile({ user }) {
+  const displayName = user.name  // ✅ Only read
+  return <div>{displayName}</div>
+}
+```
+
+Reference: [Passing Props to a Component](https://react.dev/learn/passing-props-to-a-component)
+
+### 4.6 Use Correct Keys for List Rendering
+
+**Impact: HIGH (prevents rendering bugs)**
+
+Keys tell React which array item each component corresponds to. Use stable, unique IDs from your data.
+
+**Incorrect:**
+
+```tsx
+{todos.map((todo, index) => (
+  <li key={index}>{todo.text}</li>  // ❌ Index as key
+))}
+```
+
+**Correct:**
+
+```tsx
+{todos.map((todo) => (
+  <li key={todo.id}>{todo.text}</li>  // ✅ Unique ID
+))}
+```
+
+Reference: [Rendering Lists](https://react.dev/learn/rendering-lists)
+
+### 4.7 Design State Structure Properly
+
+**Impact: HIGH (prevents bugs)**
+
+Follow these principles: group related state, avoid contradictions, avoid redundancy, avoid duplication, avoid deeply nested state.
+
+**Incorrect:**
+
+```tsx
+const [firstName, setFirstName] = useState('')
+const [lastName, setLastName] = useState('')
+const [fullName, setFullName] = useState('')  // ❌ Redundant!
+
+useEffect(() => {
+  setFullName(firstName + ' ' + lastName)
+}, [firstName, lastName])
+```
+
+**Correct:**
+
+```tsx
+const [firstName, setFirstName] = useState('')
+const [lastName, setLastName] = useState('')
+const fullName = firstName + ' ' + lastName  // ✅ Computed
+```
+
+Reference: [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure)
+
+### 4.8 Update Objects and Arrays Immutably
+
+**Impact: HIGH (ensures correct re-renders)**
+
+In React, you should treat state as immutable. Always create new copies when updating objects or arrays.
+
+**Incorrect:**
+
+```tsx
+function handleBirthday() {
+  user.age = user.age + 1  // ❌ Mutation!
+  setUser(user)
+}
+```
+
+**Correct:**
+
+```tsx
+function handleBirthday() {
+  setUser({ ...user, age: user.age + 1 })  // ✅ New object
+}
+```
+
+Reference: [Updating Objects in State](https://react.dev/learn/updating-objects-in-state)
+
+### 4.9 Lift State Up to Closest Common Parent
+
+**Impact: MEDIUM (enables component coordination)**
+
+When two or more components need to share the same state, lift that state up to their closest common parent.
+
+**Incorrect:**
+
+```tsx
+function ChildA() {
+  const [value, setValue] = useState('')  // ❌ Separate state
+  // ...
+}
+
+function ChildB() {
+  const [value, setValue] = useState('')  // ❌ Not synced!
+  // ...
+}
+```
+
+**Correct:**
+
+```tsx
+function Parent() {
+  const [value, setValue] = useState('')  // ✅ Single source
+  return (
+    <>
+      <ChildA value={value} onChange={setValue} />
+      <ChildB value={value} />
+    </>
+  )
+}
+```
+
+Reference: [Sharing State Between Components](https://react.dev/learn/sharing-state-between-components)
+
+### 4.10 Reset State with Key Prop
+
+**Impact: MEDIUM (explicit state lifecycle control)**
+
+You can reset a component's state by passing a different `key` to it.
+
+**Incorrect:**
+
+```tsx
+<Chat recipient={recipient} />  {/* State persists when recipient changes */}
+```
+
+**Correct:**
+
+```tsx
+<Chat key={recipient.id} recipient={recipient} />  {/* State resets */}
+```
+
+Reference: [Preserving and Resetting State](https://react.dev/learn/preserving-and-resetting-state)
+
+### 4.11 Use useReducer for Complex State Logic
+
+**Impact: MEDIUM (centralizes state logic)**
+
+When state logic becomes complex, use `useReducer` instead of `useState`.
+
+**Incorrect:**
+
+```tsx
+// Multiple scattered update functions
+function handleAdd(text) {
+  setItems([...items, { id: nextId++, text, done: false }])
+}
+
+function handleChange(task) {
+  setItems(items.map(t => t.id === task.id ? task : t))
+}
+```
+
+**Correct:**
+
+```tsx
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case 'added':
+      return [...tasks, { id: action.id, text: action.text, done: false }]
+    case 'changed':
+      return tasks.map(t => t.id === action.task.id ? action.task : t)
+    default:
+      throw Error('Unknown action: ' + action.type)
+  }
+}
+
+const [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+```
+
+Reference: [Extracting State Logic into a Reducer](https://react.dev/learn/extracting-state-logic-into-a-reducer)
+
+### 4.12 Use Context for Deep Prop Passing
+
+**Impact: MEDIUM (eliminates prop drilling)**
+
+When you need to pass data through many levels of components, use Context instead.
+
+**Correct:**
+
+```tsx
+const UserContext = createContext(null)
+
+function UserProvider({ children }) {
+  const [user, setUser] = useState(null)
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  )
+}
+
+function useUser() {
+  return useContext(UserContext)
+}
+```
+
+Reference: [Passing Data Deeply with Context](https://react.dev/learn/passing-data-deeply-with-context)
+
+### 4.13 Use Refs for Non-Render Values
+
+**Impact: MEDIUM (prevents unnecessary re-renders)**
+
+Use `useRef` for values that don't affect rendering. Use `useState` for values that are displayed.
+
+**Incorrect:**
+
+```tsx
+const [intervalId, setIntervalId] = useState(null)  // ❌ Causes re-render
+```
+
+**Correct:**
+
+```tsx
+const intervalRef = useRef(null)  // ✅ No re-render on change
+```
+
+Reference: [Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)
+
+### 4.14 You Might Not Need an Effect
+
+**Impact: HIGH (eliminates unnecessary effects)**
+
+Effects are for synchronizing with external systems. Many common patterns don't require effects.
+
+**Incorrect:**
+
+```tsx
+function Form({ firstName, lastName }) {
+  const [fullName, setFullName] = useState('')
+
+  useEffect(() => {
+    setFullName(firstName + ' ' + lastName)  // ❌ Unnecessary
+  }, [firstName, lastName])
+}
+```
+
+**Correct:**
+
+```tsx
+function Form({ firstName, lastName }) {
+  const fullName = firstName + ' ' + lastName  // ✅ Calculate directly
+}
+```
+
+Reference: [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+
+### 4.15 Always Clean Up Effects
+
+**Impact: HIGH (prevents memory leaks)**
+
+Effects often create resources that need cleanup. Return a cleanup function from useEffect.
+
+**Incorrect:**
+
+```tsx
+useEffect(() => {
+  const connection = createConnection()
+  connection.connect()
+  // ❌ No cleanup!
+}, [])
+```
+
+**Correct:**
+
+```tsx
+useEffect(() => {
+  const connection = createConnection()
+  connection.connect()
+
+  return () => {
+    connection.disconnect()  // ✅ Clean up
+  }
+}, [])
+```
+
+Reference: [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)
+
+### 4.16 Create Custom Hooks for Reusable Logic
+
+**Impact: MEDIUM (shares logic between components)**
+
+Custom hooks let you share stateful logic between components. Always start hook names with `use`.
+
+**Correct:**
+
+```tsx
+function useWindowSize() {
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSize({ width: window.innerWidth, height: window.innerHeight })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  return size
+}
+
+// Usage
+function Component() {
+  const { width } = useWindowSize()
+  return <div>Width: {width}</div>
+}
+```
+
+Reference: [Reusing Logic with Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
+
+---
+
+## 5. Client-Side Data Fetching
 
 **Impact: MEDIUM-HIGH**
 
 Automatic deduplication and efficient data fetching patterns reduce redundant network requests.
 
-### 4.1 Deduplicate Global Event Listeners
+### 5.1 Deduplicate Global Event Listeners
 
 **Impact: LOW (single listener for N components)**
 
@@ -1089,7 +1574,7 @@ function Profile() {
 }
 ```
 
-### 4.2 Use Passive Event Listeners for Scrolling Performance
+### 5.2 Use Passive Event Listeners for Scrolling Performance
 
 **Impact: MEDIUM (eliminates scroll delay caused by event listeners)**
 
@@ -1133,7 +1618,7 @@ useEffect(() => {
 
 **Don't use passive when:** implementing custom swipe gestures, custom zoom controls, or any listener that needs `preventDefault()`.
 
-### 4.3 Use SWR for Automatic Deduplication
+### 5.3 Use SWR for Automatic Deduplication
 
 **Impact: MEDIUM-HIGH (automatic deduplication)**
 
@@ -1185,7 +1670,7 @@ function UpdateButton() {
 
 Reference: [https://swr.vercel.app](https://swr.vercel.app)
 
-### 4.4 Version and Minimize localStorage Data
+### 5.4 Version and Minimize localStorage Data
 
 **Impact: MEDIUM (prevents schema conflicts, reduces storage size)**
 
@@ -1254,13 +1739,13 @@ function cachePrefs(user: FullUser) {
 
 ---
 
-## 5. Re-render Optimization
+## 6. Re-render Optimization
 
 **Impact: MEDIUM**
 
 Reducing unnecessary re-renders minimizes wasted computation and improves UI responsiveness.
 
-### 5.1 Defer State Reads to Usage Point
+### 6.1 Defer State Reads to Usage Point
 
 **Impact: MEDIUM (avoids unnecessary subscriptions)**
 
@@ -1295,7 +1780,7 @@ function ShareButton({ chatId }: { chatId: string }) {
 }
 ```
 
-### 5.2 Extract to Memoized Components
+### 6.2 Extract to Memoized Components
 
 **Impact: MEDIUM (enables early returns)**
 
@@ -1335,7 +1820,7 @@ function Profile({ user, loading }: Props) {
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, manual memoization with `memo()` and `useMemo()` is not necessary. The compiler automatically optimizes re-renders.
 
-### 5.3 Narrow Effect Dependencies
+### 6.3 Narrow Effect Dependencies
 
 **Impact: LOW (minimizes effect re-runs)**
 
@@ -1376,7 +1861,7 @@ useEffect(() => {
 }, [isMobile])
 ```
 
-### 5.4 Subscribe to Derived State
+### 6.4 Subscribe to Derived State
 
 **Impact: MEDIUM (reduces re-render frequency)**
 
@@ -1401,7 +1886,7 @@ function Sidebar() {
 }
 ```
 
-### 5.5 Use Functional setState Updates
+### 6.5 Use Functional setState Updates
 
 **Impact: MEDIUM (prevents stale closures and unnecessary callback recreations)**
 
@@ -1479,7 +1964,7 @@ function TodoList() {
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler can automatically optimize some cases, but functional updates are still recommended for correctness and to prevent stale closure bugs.
 
-### 5.6 Use Lazy State Initialization
+### 6.6 Use Lazy State Initialization
 
 **Impact: MEDIUM (wasted computation on every render)**
 
@@ -1533,7 +2018,7 @@ Use lazy initialization when computing initial values from localStorage/sessionS
 
 For simple primitives (`useState(0)`), direct references (`useState(props.value)`), or cheap literals (`useState({})`), the function form is unnecessary.
 
-### 5.7 Use Transitions for Non-Urgent Updates
+### 6.7 Use Transitions for Non-Urgent Updates
 
 **Impact: MEDIUM (maintains UI responsiveness)**
 
@@ -1571,13 +2056,13 @@ function ScrollTracker() {
 
 ---
 
-## 6. Rendering Performance
+## 7. Rendering Performance
 
 **Impact: MEDIUM**
 
 Optimizing the rendering process reduces the work the browser needs to do.
 
-### 6.1 Animate SVG Wrapper Instead of SVG Element
+### 7.1 Animate SVG Wrapper Instead of SVG Element
 
 **Impact: LOW (enables hardware acceleration)**
 
@@ -1620,7 +2105,7 @@ function LoadingSpinner() {
 
 This applies to all CSS transforms and transitions (`transform`, `opacity`, `translate`, `scale`, `rotate`). The wrapper div allows browsers to use GPU acceleration for smoother animations.
 
-### 6.2 CSS content-visibility for Long Lists
+### 7.2 CSS content-visibility for Long Lists
 
 **Impact: HIGH (faster initial render)**
 
@@ -1654,7 +2139,7 @@ function MessageList({ messages }: { messages: Message[] }) {
 
 For 1000 messages, browser skips layout/paint for ~990 off-screen items (10× faster initial render).
 
-### 6.3 Hoist Static JSX Elements
+### 7.3 Hoist Static JSX Elements
 
 **Impact: LOW (avoids re-creation)**
 
@@ -1696,7 +2181,7 @@ This is especially helpful for large and static SVG nodes, which can be expensiv
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler automatically hoists static JSX elements and optimizes component re-renders, making manual hoisting unnecessary.
 
-### 6.4 Optimize SVG Precision
+### 7.4 Optimize SVG Precision
 
 **Impact: LOW (reduces file size)**
 
@@ -1720,7 +2205,7 @@ Reduce SVG coordinate precision to decrease file size. The optimal precision dep
 npx svgo --precision=1 --multipass icon.svg
 ```
 
-### 6.5 Prevent Hydration Mismatch Without Flickering
+### 7.5 Prevent Hydration Mismatch Without Flickering
 
 **Impact: MEDIUM (avoids visual flicker and hydration errors)**
 
@@ -1798,7 +2283,7 @@ The inline script executes synchronously before showing the element, ensuring th
 
 This pattern is especially useful for theme toggles, user preferences, authentication states, and any client-only data that should render immediately without flashing default values.
 
-### 6.6 Use Activity Component for Show/Hide
+### 7.6 Use Activity Component for Show/Hide
 
 **Impact: MEDIUM (preserves state/DOM)**
 
@@ -1820,7 +2305,7 @@ function Dropdown({ isOpen }: Props) {
 
 Avoids expensive re-renders and state loss.
 
-### 6.7 Use Explicit Conditional Rendering
+### 7.7 Use Explicit Conditional Rendering
 
 **Impact: LOW (prevents rendering 0 or NaN)**
 
@@ -1858,13 +2343,13 @@ function Badge({ count }: { count: number }) {
 
 ---
 
-## 7. JavaScript Performance
+## 8. JavaScript Performance
 
 **Impact: LOW-MEDIUM**
 
 Micro-optimizations for hot paths can add up to meaningful improvements.
 
-### 7.1 Batch DOM CSS Changes
+### 8.1 Batch DOM CSS Changes
 
 **Impact: MEDIUM (reduces reflows/repaints)**
 
@@ -1895,7 +2380,7 @@ function updateElementStyles(element: HTMLElement) {
 
 Prefer CSS classes over inline styles when possible. CSS files are cached by the browser, and classes provide better separation of concerns and are easier to maintain.
 
-### 7.2 Build Index Maps for Repeated Lookups
+### 8.2 Build Index Maps for Repeated Lookups
 
 **Impact: LOW-MEDIUM (1M ops to 2K ops)**
 
@@ -1929,7 +2414,7 @@ Build map once (O(n)), then all lookups are O(1).
 
 For 1000 orders × 1000 users: 1M ops → 2K ops.
 
-### 7.3 Cache Property Access in Loops
+### 8.3 Cache Property Access in Loops
 
 **Impact: LOW-MEDIUM (reduces lookups)**
 
@@ -1953,7 +2438,7 @@ for (let i = 0; i < len; i++) {
 }
 ```
 
-### 7.4 Cache Repeated Function Calls
+### 8.4 Cache Repeated Function Calls
 
 **Impact: MEDIUM (avoid redundant computation)**
 
@@ -2029,7 +2514,7 @@ Use a Map (not a hook) so it works everywhere: utilities, event handlers, not ju
 
 Reference: [https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)
 
-### 7.5 Cache Storage API Calls
+### 8.5 Cache Storage API Calls
 
 **Impact: LOW-MEDIUM (reduces expensive I/O)**
 
@@ -2095,7 +2580,7 @@ document.addEventListener('visibilitychange', () => {
 
 If storage can change externally (another tab, server-set cookies), invalidate cache:
 
-### 7.6 Combine Multiple Array Iterations
+### 8.6 Combine Multiple Array Iterations
 
 **Impact: LOW-MEDIUM (reduces iterations)**
 
@@ -2123,7 +2608,7 @@ for (const user of users) {
 }
 ```
 
-### 7.7 Early Length Check for Array Comparisons
+### 8.7 Early Length Check for Array Comparisons
 
 **Impact: MEDIUM-HIGH (avoids expensive operations when lengths differ)**
 
@@ -2172,7 +2657,7 @@ This new approach is more efficient because:
 
 - It returns early when a difference is found
 
-### 7.8 Early Return from Functions
+### 8.8 Early Return from Functions
 
 **Impact: LOW-MEDIUM (avoids unnecessary computation)**
 
@@ -2218,7 +2703,7 @@ function validateUsers(users: User[]) {
 }
 ```
 
-### 7.9 Hoist RegExp Creation
+### 8.9 Hoist RegExp Creation
 
 **Impact: LOW-MEDIUM (avoids recreation)**
 
@@ -2259,7 +2744,7 @@ regex.test('foo')  // false, lastIndex = 0
 
 Global regex (`/g`) has mutable `lastIndex` state:
 
-### 7.10 Use Loop for Min/Max Instead of Sort
+### 8.10 Use Loop for Min/Max Instead of Sort
 
 **Impact: LOW (O(n) instead of O(n log n))**
 
@@ -2337,7 +2822,7 @@ const max = Math.max(...numbers)
 
 This works for small arrays, but can be slower or just throw an error for very large arrays due to spread operator limitations. Maximal array length is approximately 124000 in Chrome 143 and 638000 in Safari 18; exact numbers may vary - see [the fiddle](https://jsfiddle.net/qw1jabsx/4/). Use the loop approach for reliability.
 
-### 7.11 Use Set/Map for O(1) Lookups
+### 8.11 Use Set/Map for O(1) Lookups
 
 **Impact: LOW-MEDIUM (O(n) to O(1))**
 
@@ -2357,7 +2842,7 @@ const allowedIds = new Set(['a', 'b', 'c', ...])
 items.filter(item => allowedIds.has(item.id))
 ```
 
-### 7.12 Use toSorted() Instead of sort() for Immutability
+### 8.12 Use toSorted() Instead of sort() for Immutability
 
 **Impact: MEDIUM-HIGH (prevents mutation bugs in React state)**
 
@@ -2416,13 +2901,13 @@ const sorted = [...items].sort((a, b) => a.value - b.value)
 
 ---
 
-## 8. Advanced Patterns
+## 9. Advanced Patterns
 
 **Impact: LOW**
 
 Advanced patterns for specific cases that require careful implementation.
 
-### 8.1 Store Event Handlers in Refs
+### 9.1 Store Event Handlers in Refs
 
 **Impact: LOW (stable subscriptions)**
 
@@ -2458,7 +2943,7 @@ function useWindowEvent(event: string, handler: (e) => void) {
 
 `useEffectEvent` provides a cleaner API for the same pattern: it creates a stable function reference that always calls the latest version of the handler.
 
-### 8.2 useLatest for Stable Callback Refs
+### 9.2 useLatest for Stable Callback Refs
 
 **Impact: LOW (prevents effect re-runs)**
 

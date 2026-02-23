@@ -1,15 +1,15 @@
 ---
 name: vercel-react-best-practices
-description: React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
+description: React and Next.js performance optimization guidelines from Vercel Engineering combined with React official best practices. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, state management, or performance improvements.
 license: MIT
 metadata:
-  author: vercel
-  version: "1.0.0"
+  author: vercel + react-official
+  version: "2.0.0"
 ---
 
-# Vercel React Best Practices
+# React Best Practices
 
-Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 57 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive guide combining Vercel's performance optimization rules with React official documentation best practices. Contains 70+ rules across 9 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -27,11 +27,12 @@ Reference these guidelines when:
 | 1 | Eliminating Waterfalls | CRITICAL | `async-` |
 | 2 | Bundle Size Optimization | CRITICAL | `bundle-` |
 | 3 | Server-Side Performance | HIGH | `server-` |
-| 4 | Client-Side Data Fetching | MEDIUM-HIGH | `client-` |
-| 5 | Re-render Optimization | MEDIUM | `rerender-` |
-| 6 | Rendering Performance | MEDIUM | `rendering-` |
-| 7 | JavaScript Performance | LOW-MEDIUM | `js-` |
-| 8 | Advanced Patterns | LOW | `advanced-` |
+| 4 | React Official Best Practices | HIGH | `official-` |
+| 5 | Client-Side Data Fetching | MEDIUM-HIGH | `client-` |
+| 6 | Re-render Optimization | MEDIUM | `rerender-` |
+| 7 | Rendering Performance | MEDIUM | `rendering-` |
+| 8 | JavaScript Performance | LOW-MEDIUM | `js-` |
+| 9 | Advanced Patterns | LOW | `advanced-` |
 
 ## Quick Reference
 
@@ -53,20 +54,46 @@ Reference these guidelines when:
 ### 3. Server-Side Performance (HIGH)
 
 - `server-auth-actions` - Authenticate server actions like API routes
-- `server-cache-react` - Use React.cache() for per-request deduplication
-- `server-cache-lru` - Use LRU cache for cross-request caching
 - `server-dedup-props` - Avoid duplicate serialization in RSC props
 - `server-serialization` - Minimize data passed to client components
 - `server-parallel-fetching` - Restructure components to parallelize fetches
 - `server-after-nonblocking` - Use after() for non-blocking operations
 
-### 4. Client-Side Data Fetching (MEDIUM-HIGH)
+### 4. React Official Best Practices (HIGH)
+
+**Components:**
+- `official-component-naming` - Component names must start with capital letter
+- `official-no-nested-components` - Never define components inside other components
+- `official-pure-components` - Keep components pure, no side effects in render
+
+**Props:**
+- `official-props-destructuring` - Use props destructuring with default values
+- `official-props-readonly` - Never mutate props directly
+
+**State:**
+- `official-state-structure` - Design state structure properly (group, avoid redundancy/duplication/nesting)
+- `official-immutable-updates` - Update objects and arrays immutably
+- `official-lifting-state` - Lift state up to closest common parent
+- `official-key-resets-state` - Reset component state with key prop
+- `official-usereducer-pattern` - Use useReducer for complex state logic
+
+**Hooks:**
+- `official-refs-vs-state` - Use refs for non-render values
+- `official-custom-hooks` - Create custom hooks for reusable logic
+- `official-no-effect-needed` - You might not need an Effect
+- `official-effect-cleanup` - Always clean up effects
+- `official-context-pattern` - Use Context for deep prop passing
+
+**Lists:**
+- `official-list-keys` - Use correct keys for list rendering
+
+### 5. Client-Side Data Fetching (MEDIUM-HIGH)
 
 - `client-event-listeners` - Deduplicate global event listeners
 - `client-passive-event-listeners` - Use passive listeners for scroll
 - `client-localstorage-schema` - Version and minimize localStorage data
 
-### 5. Re-render Optimization (MEDIUM)
+### 6. Re-render Optimization (MEDIUM)
 
 - `rerender-defer-reads` - Don't subscribe to state only used in callbacks
 - `rerender-memo` - Extract expensive work into memoized components
@@ -81,7 +108,7 @@ Reference these guidelines when:
 - `rerender-transitions` - Use startTransition for non-urgent updates
 - `rerender-use-ref-transient-values` - Use refs for transient frequent values
 
-### 6. Rendering Performance (MEDIUM)
+### 7. Rendering Performance (MEDIUM)
 
 - `rendering-animate-svg-wrapper` - Animate div wrapper, not SVG element
 - `rendering-content-visibility` - Use content-visibility for long lists
@@ -93,7 +120,7 @@ Reference these guidelines when:
 - `rendering-conditional-render` - Use ternary, not && for conditionals
 - `rendering-usetransition-loading` - Prefer useTransition for loading state
 
-### 7. JavaScript Performance (LOW-MEDIUM)
+### 8. JavaScript Performance (LOW-MEDIUM)
 
 - `js-batch-dom-css` - Group CSS changes via classes or cssText
 - `js-index-maps` - Build Map for repeated lookups
@@ -108,7 +135,7 @@ Reference these guidelines when:
 - `js-set-map-lookups` - Use Set/Map for O(1) lookups
 - `js-tosorted-immutable` - Use toSorted() for immutability
 
-### 8. Advanced Patterns (LOW)
+### 9. Advanced Patterns (LOW)
 
 - `advanced-event-handler-refs` - Store event handlers in refs
 - `advanced-init-once` - Initialize app once per app load
